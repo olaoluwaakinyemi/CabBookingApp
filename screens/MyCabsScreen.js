@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, FlatList, Button } from "react-native";
+import React, { useEffect, useContext } from "react";
+import { View, Text, FlatList, Button, StyleSheet, Alert } from "react-native";
 import {
   collection,
   query,
@@ -18,8 +18,8 @@ const MyCabsScreen = () => {
     const fetchBookings = async () => {
       const q = query(
         collection(db, "bookings"),
-        where("userId", "==", "USER_ID")
-      );
+        where("userId", "==", "testUser123")
+      ); // Replace with actual user ID logic
       const bookingsSnapshot = await getDocs(q);
       const bookings = bookingsSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -31,28 +31,66 @@ const MyCabsScreen = () => {
     fetchBookings();
   }, []);
 
-  const handleCancelBooking = async (bookingId) => {
-    await deleteDoc(doc(db, "bookings", bookingId));
-    setBookedCabs(bookedCabs.filter((booking) => booking.id !== bookingId));
+  const handleCancelBooking = (bookingId) => {
+    Alert.alert(
+      "Cancel Booking",
+      "Are you sure you want to cancel the booking?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            await deleteDoc(doc(db, "bookings", bookingId));
+            setBookedCabs(
+              bookedCabs.filter((booking) => booking.id !== bookingId)
+            );
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
-    <FlatList
-      data={bookedCabs}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <View>
-          <Text>
-            {item.companyName} - {item.carModel}
-          </Text>
-          <Button
-            title="Cancel Booking"
-            onPress={() => handleCancelBooking(item.id)}
-          />
-        </View>
-      )}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={bookedCabs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.itemText}>
+              {item.companyName} - {item.carModel}
+            </Text>
+            <Button
+              title="Cancel Booking"
+              onPress={() => handleCancelBooking(item.id)}
+            />
+          </View>
+        )}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  item: {
+    padding: 16,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+  },
+  itemText: {
+    fontSize: 18,
+  },
+});
 
 export default MyCabsScreen;

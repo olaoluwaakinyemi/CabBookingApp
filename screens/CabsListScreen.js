@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { collection, getDocs } from "firebase/firestore/lite";
 import { db } from "../firebase";
 
@@ -21,20 +27,41 @@ const CabsListScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <FlatList
-      data={cabs}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate("CabDetail", { cabId: item.id })}
-        >
-          <Text>
-            {item.companyName} - {item.carModel}
-          </Text>
-        </TouchableOpacity>
-      )}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={cabs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => navigation.navigate("CabDetail", { cabId: item.id })}
+          >
+            <Text style={styles.itemText}>
+              {item.companyName} - {item.carModel}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  item: {
+    padding: 16,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+  },
+  itemText: {
+    fontSize: 18,
+  },
+});
 
 export default CabsListScreen;

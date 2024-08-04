@@ -2,6 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Icon from "react-native-vector-icons/Ionicons";
 import CabsListScreen from "./screens/CabsListScreen";
 import CabDetailScreen from "./screens/CabDetailScreen";
 import MyCabsScreen from "./screens/MyCabsScreen";
@@ -12,17 +13,9 @@ const Tab = createBottomTabNavigator();
 
 function HomeStack() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="CabsList"
-        component={CabsListScreen}
-        options={{ title: "Cabs List" }}
-      />
-      <Stack.Screen
-        name="CabDetail"
-        component={CabDetailScreen}
-        options={{ title: "Cab Detail" }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="CabsList" component={CabsListScreen} />
+      <Stack.Screen name="CabDetail" component={CabDetailScreen} />
     </Stack.Navigator>
   );
 }
@@ -31,17 +24,26 @@ export default function App() {
   return (
     <BookingProvider>
       <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen
-            name="Home"
-            component={HomeStack}
-            options={{ title: "Home" }}
-          />
-          <Tab.Screen
-            name="My Cab"
-            component={MyCabsScreen}
-            options={{ title: "My Cabs" }}
-          />
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ color, size }) => {
+              let iconName;
+              if (route.name === "Home") {
+                iconName = "home-outline";
+              } else if (route.name === "My Cab") {
+                iconName = "car-outline";
+              }
+              return <Icon name={iconName} size={size} color={color} />;
+            },
+          })}
+          tabBarOptions={{
+            activeTintColor: "tomato",
+            inactiveTintColor: "gray",
+            showLabel: false,
+          }}
+        >
+          <Tab.Screen name="Home" component={HomeStack} />
+          <Tab.Screen name="My Cab" component={MyCabsScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </BookingProvider>

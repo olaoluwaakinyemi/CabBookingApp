@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
 import { doc, getDoc, addDoc, collection } from "firebase/firestore/lite";
 import { db } from "../firebase";
 import { BookingContext } from "../context/BookingContext";
@@ -20,9 +20,10 @@ const CabDetailScreen = ({ route, navigation }) => {
   }, [cabId]);
 
   const handleBookCab = async () => {
+    const userId = "testUser123"; // Example user ID, replace with actual user management logic
     if (bookedCabs.length < 2) {
       const bookingData = {
-        userId: "USER_ID",
+        userId,
         cabId: cab.id,
         companyName: cab.companyName,
         carModel: cab.carModel,
@@ -32,6 +33,13 @@ const CabDetailScreen = ({ route, navigation }) => {
       };
       const bookingRef = await addDoc(collection(db, "bookings"), bookingData);
       setBookedCabs([...bookedCabs, { id: bookingRef.id, ...bookingData }]);
+
+      Alert.alert("Cab Booked", "Your cab has been successfully booked.", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("CabsList"),
+        },
+      ]);
     } else {
       alert("You cannot book more than 2 cabs at a time.");
     }
@@ -40,15 +48,31 @@ const CabDetailScreen = ({ route, navigation }) => {
   if (!cab) return <Text>Loading...</Text>;
 
   return (
-    <View>
-      <Text>{cab.companyName}</Text>
-      <Text>{cab.carModel}</Text>
-      <Text>Passengers: {cab.numberOfPassengers}</Text>
-      <Text>Rating: {cab.rating}</Text>
-      <Text>Cost/Hour: {cab.costPerHour}</Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>{cab.companyName}</Text>
+      <Text style={styles.value}>{cab.carModel}</Text>
+      <Text style={styles.label}>Passengers: {cab.numberOfPassengers}</Text>
+      <Text style={styles.value}>Rating: {cab.rating}</Text>
+      <Text style={styles.value}>Cost/Hour: ${cab.costPerHour}</Text>
       <Button title="Book Cab" onPress={handleBookCab} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  value: {
+    fontSize: 16,
+    marginVertical: 4,
+  },
+});
 
 export default CabDetailScreen;
